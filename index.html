@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>هل تحب مريم؟</title>
+    <style>
+        :root {
+            --purple: #8a2be2;
+            --light-purple: #e6e6fa;
+            --dark-purple: #4b0082;
+            --pink: #ff69b4;
+            --white: #ffffff;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, var(--light-purple), var(--white));
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--dark-purple);
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 500px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            text-align: center;
+            transition: all 0.5s ease;
+            border: 2px solid var(--purple);
+        }
+        
+        h1 {
+            color: var(--dark-purple);
+            margin-bottom: 30px;
+            font-size: 28px;
+            text-shadow: 1px 1px 3px rgba(138, 43, 226, 0.3);
+        }
+        
+        .question-container {
+            display: block;
+        }
+        
+        .question {
+            font-size: 18px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: var(--dark-purple);
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .option {
+            background-color: var(--white);
+            border: 2px solid var(--purple);
+            color: var(--dark-purple);
+            border-radius: 50px;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+        
+        .option:hover {
+            background-color: var(--purple);
+            color: white;
+            transform: translateY(-3px);
+        }
+        
+        .progress-container {
+            width: 100%;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            height: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--purple), var(--pink));
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .score {
+            font-size: 16px;
+            color: var(--purple);
+            margin-bottom: 20px;
+        }
+        
+        .heart-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 1s ease;
+        }
+        
+        .heart {
+            font-size: 100px;
+            animation: pulse 1.5s infinite;
+            background: linear-gradient(45deg, var(--purple), var(--pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+        }
+        
+        .result-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--dark-purple);
+            margin-bottom: 20px;
+        }
+        
+        .restart-btn {
+            background: linear-gradient(45deg, var(--purple), var(--pink));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .restart-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+                width: 85%;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .question {
+                font-size: 16px;
+            }
+            
+            .option {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            .heart {
+                font-size: 80px;
+            }
+        }
+    </style>
+    <!-- أصوات التطبيق -->
+    <audio id="correctSound" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" preload="auto"></audio>
+    <audio id="wrongSound" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" preload="auto"></audio>
+    <audio id="winSound" src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3" preload="auto"></audio>
+    <audio id="backgroundMusic" loop>
+        <source src="https://assets.mixkit.co/music/preview/mixkit-clear-love-745.mp3" type="audio/mpeg">
+    </audio>
+</head>
+<body>
+    <div class="container">
+        <div class="question-container" id="questionContainer">
+            <h1>هل تحب مريم؟</h1>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="score" id="score">السؤال 1 من 20</div>
+            <div class="question" id="question"></div>
+            <div class="options" id="options"></div>
+            <button id="musicToggle" style="background: var(--purple); color: white; border: none; padding: 8px 15px; border-radius: 20px; margin-top: 10px;">
+                تشغيل الموسيقى
+            </button>
+        </div>
+        
+        <div class="heart-container" id="heartContainer">
+            <div class="heart">❤️</div>
+            <div class="result-text">مبروك! لقد حصلت على علامة كاملة!</div>
+            <div class="result-desc" id="resultDesc"></div>
+            <button class="restart-btn" onclick="restartQuiz()">إعادة الاختبار</button>
+        </div>
+    </div>
+
+    <script>
+        // أسئلة الاختبار
+        const questions = [
+            {
+                question: "كم مرة تفكر في مريم خلال اليوم؟",
+                options: ["أقل من 5 مرات", "5-10 مرات", "أكثر من 10 مرات", "طوال الوقت!"],
+                correctAnswer: 3
+            },
+            {
+                question: "كيف تشعر عندما تكون مع مريم؟",
+                options: ["مرتاح", "سعيد", "متحمس", "أشعر أنني في الجنة"],
+                correctAnswer: 3
+            },
+            {
+                question: "ماذا تفعل من أجل إسعاد مريم؟",
+                options: ["أشياء صغيرة بين الحين والآخر", "أحاول إسعادها يومياً", "أضحيه بوقتي وراحتي", "أفعل أي شيء من أجلها"],
+                correctAnswer: 3
+            },
+            {
+                question: "كيف تتصرف عندما تمر مريم بيوم صعب؟",
+                options: ["أحاول تشجيعها", "أبقى بجانبها", "أفعل كل ما بوسعي لمساعدتها", "أشعرها بأنها الأهم في حياتي"],
+                correctAnswer: 3
+            },
+            {
+                question: "ما هو أكثر شيء يعجبك في مريم؟",
+                options: ["مظهرها", "شخصيتها", "طريقة تعاملها معي", "كل شيء فيها!"],
+                correctAnswer: 3
+            },
+            {
+                question: "هل تخاف من فقدان مريم؟",
+                options: ["نادراً ما أفكر في هذا", "أحياناً", "كثيراً", "هذا أكبر خوف لدي"],
+                correctAnswer: 3
+            },
+            {
+                question: "كيف تصف علاقتك بمريم؟",
+                options: ["علاقة عادية", "علاقة جيدة", "علاقة مميزة", "أجمل علاقة في حياتي"],
+                correctAnswer: 3
+            },
+            {
+                question: "ما هي أجمل ذكرى مع مريم؟",
+                options: ["أول لقاء", "أول حديث طويل", "أول مناسبة خاصة", "كل لحظة معها جميلة"],
+                correctAnswer: 3
+            },
+            {
+                question: "ماذا ستختار لو خيروك بين مريم وأي شيء آخر؟",
+                options: ["سأفكر بالأمر", "يعتمد على الموقف", "سأختارها في معظم الأحيان", "مريم أولاً دائماً"],
+                correctAnswer: 3
+            },
+            {
+                question: "كيف تتصرف إذا غضبت منك مريم؟",
+                options: ["أنتظر حتى تهدأ", "أحاول إرضاءها", "أبذل كل جهدي لإصلاح الموقف", "لا أستطيع تحمل رؤيتها غاضبة"],
+                correctAnswer: 3
+            }
+            // يمكنك إضافة 10 أسئلة أخرى هنا
+        ];
+
+        // تهيئة المتغيرات
+        let currentQuestion = 0;
+        let score = 0;
+        const totalQuestions = questions.length;
+        let backgroundMusicPlaying = false;
+        const backgroundMusic = document.getElementById("backgroundMusic");
+        
+        // عناصر DOM
+        const questionContainer = document.getElementById('questionContainer');
+        const heartContainer = document.getElementById('heartContainer');
+        const questionElement = document.getElementById('question');
+        const optionsElement = document.getElementById('options');
+        const scoreElement = document.getElementById('score');
+        const progressBar = document.getElementById('progressBar');
+        const resultDesc = document.getElementById('resultDesc');
+        const musicToggle = document.getElementById('musicToggle');
+        
+        // بدء الاختبار
+        function startQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            showQuestion();
+        }
+        
+        // عرض السؤال الحالي
+        function showQuestion() {
+            if (currentQuestion >= totalQuestions) {
+                showResult();
+                return;
+            }
+            
+            const question = questions[currentQuestion];
+            questionElement.textContent = question.question;
+            
+            optionsElement.innerHTML = '';
+            question.options.forEach((option, index) => {
+                const button = document.createElement('div');
+                button.className = 'option';
+                button.textContent = option;
+                button.onclick = () => selectAnswer(index);
+                optionsElement.appendChild(button);
+            });
+            
+            scoreElement.textContent = `السؤال ${currentQuestion + 1} من ${totalQuestions}`;
+            progressBar.style.width = `${(currentQuestion / totalQuestions) * 100}%`;
+        }
+        
+        // اختيار الإجابة
+        function selectAnswer(selectedIndex) {
+            const question = questions[currentQuestion];
+            if (selectedIndex === question.correctAnswer) {
+                score++;
+                document.getElementById("correctSound").play();
+            } else {
+                document.getElementById("wrongSound").play();
+            }
+            
+            currentQuestion++;
+            showQuestion();
+        }
+        
+        // عرض النتيجة
+        function showResult() {
+            document.getElementById("winSound").play();
+            if (backgroundMusicPlaying) {
+                backgroundMusic.pause();
+                backgroundMusicPlaying = false;
+                musicToggle.textContent = "تشغيل الموسيقى";
+            }
+            
+            questionContainer.style.display = 'none';
+            heartContainer.style.display = 'flex';
+            
+            const percentage = Math.round((score / totalQuestions) * 100);
+            
+            if (percentage === 100) {
+                resultDesc.textContent = "أنت تحب مريم بجنون! هذه مشاعر حقيقية من القلب ❤️";
+            } else if (percentage >= 80) {
+                resultDesc.textContent = "أنت تحب مريم كثيراً وهناك مشاعر قوية بينكما! 💜";
+            } else if (percentage >= 60) {
+                resultDesc.textContent = "هناك مشاعر حب بينكما ولكن يمكن تطويرها أكثر ✨";
+            } else {
+                resultDesc.textContent = "مشاعرك تجاه مريم تحتاج إلى مزيد من الاهتمام والعناية 💔";
+            }
+        }
+        
+        // إعادة الاختبار
+        function restartQuiz() {
+            heartContainer.style.display = 'none';
+            questionContainer.style.display = 'block';
+            startQuiz();
+        }
+        
+        // التحكم بالموسيقى الخلفية
+        musicToggle.addEventListener('click', function() {
+            if (backgroundMusicPlaying) {
+                backgroundMusic.pause();
+                musicToggle.textContent = "تشغيل الموسيقى";
+            } else {
+                backgroundMusic.play();
+                musicToggle.textContent = "إيقاف الموسيقى";
+            }
+            backgroundMusicPlaying = !backgroundMusicPlaying;
+        });
+        
+        // بدء الاختبار عند تحميل الصفحة
+        window.onload = startQuiz;
+    </script>
+</body>
+</html>
